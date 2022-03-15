@@ -7,6 +7,7 @@ const URL = 'http://localhost/ostoslista/shoppinglist/';
 function App() {
   const [items, setItems] = useState([]);
   const [item, setItem] = useState('');
+  const [amount, setAmount] = useState('');
 
   useEffect(() => {
     axios.get(URL)
@@ -20,7 +21,7 @@ function App() {
 
   function add(e) {
     e.preventDefault();
-    const json = JSON.stringify({description:item});
+    const json = JSON.stringify({description:item, amount: amount});
     axios.post(URL + 'add.php',json, {
       headers: {
         'Content-Type' : 'application/json'
@@ -29,6 +30,7 @@ function App() {
     .then((response) => {
       setItems(items => [...items,response.data]);
       setItem('');
+      setAmount('');
     }).catch (error => {
       alert(error.response ? error.response.data.error : error);
     });
@@ -55,17 +57,26 @@ function App() {
       <h3>Shopping list</h3>
       <form onSubmit={add}>
         <label>New item</label>
-        <input value={item} placeholder='Add new item' onChange={e => setItem(e.target.value)}></input>
+        <input type="text" value={item} placeholder='Add new item' onChange={e => setItem(e.target.value)}></input>
+        <input type="number" placeholder='type amount' value={amount} onChange={(e) => setAmount(e.target.value)}></input>
         <button>Add</button>
       </form>
-     <ol>
-       {items?.map(item =>(
-         <li key={item.id}>{item.description}&nbsp;
-          <a href='#' className='delete' onClick={() => remove(item.id)}>Delete</a>
-         </li>
-       ))}
-     </ol>
-    </div>
+      <table>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id}>
+              <td>{item.description}</td>
+              <td>{item.amount}</td>
+              <td>
+                <a href="#" onClick={() => remove(item.id)}>
+                  Delete
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      </div>
   );
 }
 
